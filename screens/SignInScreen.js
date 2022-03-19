@@ -1,0 +1,182 @@
+import React, {useState} from 'react';
+import {StatusBar, ToastAndroid, ActivityIndicator} from 'react-native';
+import styled from 'styled-components';
+
+import {APIURL} from '../components/Global';
+import {AuthContext} from '../components/Context';
+
+export default function SignInScreen({navigation}) {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+
+    const [signInLoader, setSignInLoader] = useState(false);
+
+    const {signIn} = React.useContext(AuthContext);
+
+    function submitForm() {
+        setEmailError();
+        setPasswordError();
+
+        if (email === undefined || email.length === 0 || email === '') {
+            setEmailError("Please enter email!");
+            return;
+        }
+
+        if (email.length > 50) {
+            setEmailError("Email not be greater than 50 characters!");
+            return;
+        }
+
+        if (validateEmail(email) === false) {
+            setEmailError("Please enter valid email!");
+            return;
+        }
+
+        if (password === undefined || password.length === 0 || password === '') {
+            setPasswordError("Please enter password!");
+            return;
+        }
+
+        if (password.length < 6) {
+            setPasswordError("Password must be 6 characters!");
+            return;
+        }
+
+        if (password.length > 10) {
+            setPasswordError("Password not be greater than 10 characters");
+            return;
+        }
+
+        setSignInLoader(true);
+
+        fetch(APIURL.url + 'login', {
+            method: 'POST',
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        }).then((response) => response.json())
+            .then((data) => {
+                if (data.status === false) {
+                    setEmailError(data.errors.email);
+                    setPasswordError(data.errors.password);
+                } else {
+                    signIn(data.data);
+                    ToastAndroid.show(data.message, ToastAndroid.SHORT);
+                }
+                setSignInLoader(false);
+            }).catch((error) => {
+            console.error("Register error : " + error);
+            ToastAndroid.show("Something went wrong!", ToastAndroid.SHORT);
+            setSignInLoader(false);
+        });
+    }
+
+    const validateEmail = (email) => {
+        return email.match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/) === null ? false : true;
+    };
+
+    return (
+        <Container>
+            <StatusBar hidden={true}/>
+            <Header>
+                <HeaderText>Sign In</HeaderText>
+            </Header>
+            <FormContent>
+
+                <FormGroup>
+                    <Label>Email</Label>
+                    <Input onChangeText={text => setEmail(text)}/>
+                    {emailError !== '' ? <ErrorText>{emailError}</ErrorText> : null}
+                </FormGroup>
+
+                <FormGroup>
+                    <Label>Password</Label>
+                    <Input onChangeText={text => setPassword(text)} secureTextEntry={true}/>
+                    {passwordError !== '' ? <ErrorText>{passwordError}</ErrorText> : null}
+                </FormGroup>
+
+                <SubmitBtn onPress={() => submitForm()} disable={signInLoader}>
+                    {signInLoader ? (
+                            <ActivityIndicator size="small" color="#98FB98"/>)
+                        : (<SignInButtonText center>Sign In</SignInButtonText>)}
+                </SubmitBtn>
+
+                <SignUpLink>Have not account?{' '}<SignUpLink
+                    onPress={() => navigation.navigate('SignUp')}>Sign Up
+                </SignUpLink>
+                </SignUpLink>
+
+            </FormContent>
+        </Container>
+    );
+};
+
+const Container = styled.View`
+flex:1;
+backgroundColor: #98FB98;
+padding:4%;
+`;
+
+const Header = styled.View`
+flex:1;
+`;
+
+const HeaderText = styled.Text`
+font-size:20px;
+color:#000;
+`;
+
+const FormContent = styled.View`
+flex:5;
+`;
+
+const FormGroup = styled.View`
+margin-bottom:25px;
+`;
+
+const Label = styled.Text`
+margin-bottom:5px;
+color:#000;
+`;
+
+const Input = styled.TextInput`
+height:35px;
+border-bottom-width:1px;
+border-color:#fff;
+`;
+
+const ErrorText = styled.Text`
+color:#FF0000;
+margin-top:2px;
+`;
+
+const SubmitBtn = styled.TouchableOpacity`
+border:0px solid;
+justify-content:center;
+backgroundColor: #fff;
+padding:10px;
+border-radius:5px;
+width:100%;
+margin-top:20px;
+margin-bottom:20px;
+text-align:center;
+elevation : 10;
+`;
+
+const SignInButtonText = styled.Text`
+color:#000;
+text-align:center;
+justify-content:center;
+`;
+
+const SignUpLink = styled.Text`
+color:#000;
+`;
