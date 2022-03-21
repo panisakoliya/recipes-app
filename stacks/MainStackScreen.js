@@ -8,7 +8,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import HomeScreen from '../screens/HomeScreen';
 import AudioScreen from '../screens/AudioScreen';
 
-
 export default function MainStackScreen() {
     const [name, setName] = useState('');
 
@@ -24,7 +23,6 @@ export default function MainStackScreen() {
     useEffect(() => {
         userDetails();
     }, []);
-
 
     const Tab = createBottomTabNavigator();
 
@@ -45,22 +43,14 @@ export default function MainStackScreen() {
                     iconName = focused ? 'home' : 'home-outline';
                     break;
 
-                case 'Search':
-                    iconName = focused ? 'search' : 'search-outline';
-                    break;
-
-                case 'Favorite':
-                    iconName = focused ? 'heart' : 'heart-outline';
-                    break;
-
-                case 'Profile':
-                    iconName = focused ? 'person' : 'person-outline';
+                case 'Audio':
+                    iconName = focused ? 'headset' : 'headset-outline';
                     break;
 
                 default:
                     iconName = focused ? 'home' : 'home-outline';
             }
-            return <Ionicons name={iconName} size={20} color={'#ff9933'}/>;
+            return <Ionicons name={iconName} size={20} color={'#98FB98'}/>;
         },
     });
 
@@ -86,7 +76,7 @@ backgroundColor: #98FB98;
 `;
 
 const Header = styled.View`
-flex:0.5;
+flex:0.4;
 padding:4%;
 `;
 
@@ -96,5 +86,5 @@ color:#000;
 `;
 
 const Content = styled.View`
-flex:5.5;
+flex:5.6;
 `;

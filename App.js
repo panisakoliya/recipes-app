@@ -20,7 +20,6 @@ export default function App() {
         userDetails: null,
     };
 
-
     const loginReducer = (prevState, action) => {
         switch (action.type) {
             case 'retrieve_token':
